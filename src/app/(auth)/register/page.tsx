@@ -15,6 +15,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { AddressAutocomplete, AddressData } from '@/components/ui/address-autocomplete'
+import { AddressInputFallback } from '@/components/ui/address-input-fallback'
 import { Loader2, Mail } from 'lucide-react'
 import { Profession } from '@/types'
 import { validateRPPS, getProfessionLabel } from '@/lib/utils'
@@ -380,53 +381,65 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <AddressAutocomplete
-            label="Adresse du cabinet"
-            placeholder="Commencez à saisir l'adresse de votre cabinet..."
-            value={form.watch('address') || ''}
-            onAddressSelect={handleAddressSelect}
-            onInputChange={(value) => form.setValue('address', value)}
-            error={form.formState.errors.address?.message}
-            required
-            disabled={isLoading}
-            className="space-y-2"
-          />
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="city">Ville</Label>
-              <Input
-                id="city"
-                placeholder="Ville (rempli automatiquement)"
-                {...form.register('city')}
+          {process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY && 
+           process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY !== 'placeholder_google_maps_key' ? (
+            <>
+              <AddressAutocomplete
+                label="Adresse du cabinet"
+                placeholder="Commencez à saisir l'adresse de votre cabinet..."
+                value={form.watch('address') || ''}
+                onAddressSelect={handleAddressSelect}
+                onInputChange={(value) => form.setValue('address', value)}
+                error={form.formState.errors.address?.message}
+                required
                 disabled={isLoading}
-                readOnly
-                className="bg-muted"
+                className="space-y-2"
               />
-              {form.formState.errors.city && (
-                <p className="text-sm text-red-600">
-                  {form.formState.errors.city.message}
-                </p>
-              )}
-            </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="city">Ville</Label>
+                  <Input
+                    id="city"
+                    placeholder="Ville (rempli automatiquement)"
+                    {...form.register('city')}
+                    disabled={isLoading}
+                    readOnly
+                    className="bg-muted"
+                  />
+                  {form.formState.errors.city && (
+                    <p className="text-sm text-red-600">
+                      {form.formState.errors.city.message}
+                    </p>
+                  )}
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="postalCode">Code postal</Label>
-              <Input
-                id="postalCode"
-                placeholder="Code postal (rempli automatiquement)"
-                {...form.register('postalCode')}
-                disabled={isLoading}
-                readOnly
-                className="bg-muted"
-              />
-              {form.formState.errors.postalCode && (
-                <p className="text-sm text-red-600">
-                  {form.formState.errors.postalCode.message}
-                </p>
-              )}
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <Label htmlFor="postalCode">Code postal</Label>
+                  <Input
+                    id="postalCode"
+                    placeholder="Code postal (rempli automatiquement)"
+                    {...form.register('postalCode')}
+                    disabled={isLoading}
+                    readOnly
+                    className="bg-muted"
+                  />
+                  {form.formState.errors.postalCode && (
+                    <p className="text-sm text-red-600">
+                      {form.formState.errors.postalCode.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <AddressInputFallback
+              onAddressChange={(value) => form.setValue('address', value)}
+              onCityChange={(value) => form.setValue('city', value)}
+              onPostalCodeChange={(value) => form.setValue('postalCode', value)}
+              error={form.formState.errors.address?.message}
+              disabled={isLoading}
+            />
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="bio">Présentation (optionnel)</Label>
