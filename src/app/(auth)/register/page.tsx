@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -60,7 +59,6 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [showEmailConfirmation, setShowEmailConfirmation] = useState(false)
   const [userEmail, setUserEmail] = useState('')
-  const router = useRouter()
   const supabase = createClient()
 
   // Gérer la sélection d'adresse avec géocodage
