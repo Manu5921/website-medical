@@ -23,23 +23,15 @@ export async function GET(
   try {
     const supabase = await createClient()
     
-    // Récupérer le professionnel avec ses disponibilités
+    // Récupérer le professionnel d'abord
     const { data: professional, error: professionalError } = await supabase
       .from('professionals')
-      .select(`
-        *,
-        availabilities (
-          id,
-          day_of_week,
-          start_time,
-          end_time,
-          is_active
-        )
-      `)
+      .select('*')
       .eq('id', id)
       .single()
 
     if (professionalError) {
+      console.error('Professional fetch error:', professionalError)
       if (professionalError.code === 'PGRST116') {
         return NextResponse.json(
           { error: 'Professionnel non trouvé' },
@@ -47,6 +39,22 @@ export async function GET(
         )
       }
       throw professionalError
+    }
+
+    // Récupérer les disponibilités séparément
+    const { data: availabilities, error: availabilitiesError } = await supabase
+      .from('availabilities')
+      .select('id, day_of_week, start_time, end_time, is_active')
+      .eq('professional_id', id)
+
+    if (availabilitiesError) {
+      console.error('Availabilities fetch error:', availabilitiesError)
+    }
+
+    // Combiner les données
+    const professionalWithAvailabilities = {
+      ...professional,
+      availabilities: availabilities || []
     }
 
     // Récupérer les prochains créneaux bloqués
@@ -71,7 +79,7 @@ export async function GET(
 
     return NextResponse.json({
       professional: {
-        ...professional,
+        ...professionalWithAvailabilities,
         blockedSlots: blockedSlots || [],
         stats: {
           completedAppointments: appointmentCount || 0
@@ -80,6 +88,21 @@ export async function GET(
     })
   } catch (error) {
     console.error('API error:', error)
+    
+    // Log more detailed error information
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      })
+    }
+    
+    // Check if it's a Supabase error with specific code
+    if (error && typeof error === 'object' && 'code' in error) {
+      console.error('Supabase error code:', error.code)
+    }
+    
     return NextResponse.json(
       { error: 'Erreur lors de la récupération du professionnel' },
       { status: 500 }
