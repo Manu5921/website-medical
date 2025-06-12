@@ -23,6 +23,7 @@ import {
 import { mockProfessionals, professionLabels } from '@/lib/mockData'
 import { Professional } from '@/types'
 import BookAppointmentDialog from '@/components/appointments/BookAppointmentDialog'
+import DirectionsButton from '@/components/professionals/DirectionsButton'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -183,6 +184,31 @@ export default function ProfessionalDetailPage({ params }: PageProps) {
                       <Mail className="mr-2 h-4 w-4" />
                       Envoyer un message
                     </Button>
+                  </div>
+
+                  {/* Actions rapides */}
+                  <div className="flex flex-wrap gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => window.open(`tel:${professional.phone}`, '_self')}
+                    >
+                      <Phone className="h-4 w-4 mr-2" />
+                      Appeler
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => window.open(`mailto:${professional.email}`, '_self')}
+                    >
+                      <Mail className="h-4 w-4 mr-2" />
+                      Email
+                    </Button>
+                    <DirectionsButton 
+                      professional={professional}
+                      variant="outline"
+                      size="sm"
+                    />
                   </div>
                 </div>
               </div>

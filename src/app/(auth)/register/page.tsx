@@ -14,7 +14,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2 } from 'lucide-react'
+import { AddressAutocomplete, AddressData } from '@/components/ui/address-autocomplete'
+import { Loader2, Mail } from 'lucide-react'
 import { Profession } from '@/types'
 import { validateRPPS, getProfessionLabel } from '@/lib/utils'
 
@@ -30,6 +31,8 @@ const registerSchema = z.object({
   address: z.string().min(5, 'Adresse requise'),
   city: z.string().min(2, 'Ville requise'),
   postalCode: z.string().regex(/^\d{5}$/, 'Code postal invalide'),
+  latitude: z.number().optional(),
+  longitude: z.number().optional(),
   bio: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Les mots de passe ne correspondent pas",
@@ -54,8 +57,22 @@ const professions: Profession[] = [
 export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false)
+  const [userEmail, setUserEmail] = useState('')
   const router = useRouter()
   const supabase = createClient()
+
+  // Gérer la sélection d'adresse avec géocodage
+  const handleAddressSelect = (addressData: AddressData) => {
+    form.setValue('address', addressData.formatted_address)
+    form.setValue('city', addressData.locality)
+    form.setValue('postalCode', addressData.postal_code)
+    form.setValue('latitude', addressData.latitude)
+    form.setValue('longitude', addressData.longitude)
+    
+    // Effacer les erreurs d'adresse une fois qu'une adresse valide est sélectionnée
+    form.clearErrors(['address', 'city', 'postalCode'])
+  }
 
   const form = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -71,6 +88,8 @@ export default function RegisterPage() {
       address: '',
       city: '',
       postalCode: '',
+      latitude: undefined,
+      longitude: undefined,
       bio: '',
     },
   })
@@ -80,10 +99,28 @@ export default function RegisterPage() {
     setError(null)
 
     try {
-      // Create auth user
+      // Create auth user with email confirmation
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/confirm`,
+          data: {
+            registration_data: {
+              firstName: data.firstName,
+              lastName: data.lastName,
+              profession: data.profession,
+              rppsNumber: data.rppsNumber,
+              phone: data.phone,
+              address: data.address,
+              city: data.city,
+              postalCode: data.postalCode,
+              latitude: data.latitude,
+              longitude: data.longitude,
+              bio: data.bio,
+            }
+          }
+        }
       })
 
       if (authError) {
@@ -96,7 +133,15 @@ export default function RegisterPage() {
         return
       }
 
-      // Create professional profile
+      // Vérifier si l'email a été confirmé (en mode dev, peut être automatique)
+      if (!authData.user.email_confirmed_at && authData.user.identities?.length === 0) {
+        // L'utilisateur doit confirmer son email
+        setUserEmail(data.email)
+        setShowEmailConfirmation(true)
+        return
+      }
+
+      // Create professional profile seulement si email confirmé
       const { error: profileError } = await supabase
         .from('professionals')
         .insert({
@@ -110,6 +155,8 @@ export default function RegisterPage() {
           address: data.address,
           city: data.city,
           postal_code: data.postalCode,
+          latitude: data.latitude || null,
+          longitude: data.longitude || null,
           bio: data.bio || null,
         })
 
@@ -125,6 +172,59 @@ export default function RegisterPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Affichage de confirmation d'email
+  if (showEmailConfirmation) {
+    return (
+      <Card className="shadow-xl">
+        <CardHeader className="space-y-1 text-center">
+          <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+            <Mail className="h-6 w-6 text-blue-600" />
+          </div>
+          <CardTitle className="text-2xl font-bold">
+            Vérifiez votre email
+          </CardTitle>
+          <CardDescription>
+            Un email de confirmation a été envoyé
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert className="bg-blue-50 text-blue-800 border-blue-200">
+            <Mail className="h-4 w-4" />
+            <AlertDescription>
+              Nous avons envoyé un email de confirmation à <strong>{userEmail}</strong>. 
+              Cliquez sur le lien dans l'email pour activer votre compte.
+            </AlertDescription>
+          </Alert>
+
+          <div className="text-sm text-muted-foreground space-y-2">
+            <p>• Vérifiez également votre dossier spam/courrier indésirable</p>
+            <p>• Le lien expire dans 24 heures</p>
+            <p>• Après confirmation, vous pourrez vous connecter</p>
+          </div>
+
+          <div className="flex flex-col gap-3 pt-4">
+            <Button 
+              onClick={() => {
+                setShowEmailConfirmation(false)
+                form.reset()
+              }}
+              variant="outline"
+              className="w-full"
+            >
+              Modifier l'email
+            </Button>
+            
+            <Button asChild className="w-full">
+              <Link href="/login">
+                Aller à la connexion
+              </Link>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
@@ -280,29 +380,28 @@ export default function RegisterPage() {
             )}
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="address">Adresse</Label>
-            <Input
-              id="address"
-              placeholder="123 Rue de la Santé"
-              {...form.register('address')}
-              disabled={isLoading}
-            />
-            {form.formState.errors.address && (
-              <p className="text-sm text-red-600">
-                {form.formState.errors.address.message}
-              </p>
-            )}
-          </div>
+          <AddressAutocomplete
+            label="Adresse du cabinet"
+            placeholder="Commencez à saisir l'adresse de votre cabinet..."
+            value={form.watch('address') || ''}
+            onAddressSelect={handleAddressSelect}
+            onInputChange={(value) => form.setValue('address', value)}
+            error={form.formState.errors.address?.message}
+            required
+            disabled={isLoading}
+            className="space-y-2"
+          />
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="city">Ville</Label>
               <Input
                 id="city"
-                placeholder="Paris"
+                placeholder="Ville (rempli automatiquement)"
                 {...form.register('city')}
                 disabled={isLoading}
+                readOnly
+                className="bg-muted"
               />
               {form.formState.errors.city && (
                 <p className="text-sm text-red-600">
@@ -315,9 +414,11 @@ export default function RegisterPage() {
               <Label htmlFor="postalCode">Code postal</Label>
               <Input
                 id="postalCode"
-                placeholder="75001"
+                placeholder="Code postal (rempli automatiquement)"
                 {...form.register('postalCode')}
                 disabled={isLoading}
+                readOnly
+                className="bg-muted"
               />
               {form.formState.errors.postalCode && (
                 <p className="text-sm text-red-600">

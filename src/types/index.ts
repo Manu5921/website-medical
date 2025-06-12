@@ -9,6 +9,8 @@ export type Professional = {
   address: string
   city: string
   postal_code: string
+  latitude?: number
+  longitude?: number
   bio?: string
   avatar_url?: string
   created_at: string
