@@ -47,7 +47,7 @@ export async function middleware(request: NextRequest) {
     }
 
     return supabaseResponse
-  } catch (e) {
+  } catch {
     // If there's an error, just continue without auth
     return supabaseResponse
   }
