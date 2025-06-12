@@ -57,7 +57,7 @@ export default function HomePage() {
               <p className="text-sm text-blue-700 flex items-center justify-center gap-2">
                 <MapPin className="h-4 w-4" />
                 <span>
-                  💡 <strong>Astuce :</strong> Après inscription, cliquez sur l'icône "carte" dans l'annuaire pour voir tous les professionnels géolocalisés
+                  💡 <strong>Astuce :</strong> Après inscription, cliquez sur l'icône carte dans l'annuaire pour voir tous les professionnels géolocalisés
                 </span>
               </p>
             </div>
@@ -179,7 +179,7 @@ export default function HomePage() {
               </CardHeader>
               <CardContent>
                 <CardDescription className="mb-4">
-                  Dans l'annuaire, cliquez sur l'icône "carte" (3ème bouton) pour voir tous les professionnels géolocalisés.
+                  Dans l'annuaire, cliquez sur l'icône carte (3ème bouton) pour voir tous les professionnels géolocalisés.
                 </CardDescription>
                 <Button size="sm" variant="outline" asChild>
                   <Link href="/professionals">
@@ -201,7 +201,7 @@ export default function HomePage() {
                   Activez votre géolocalisation puis filtrez les professionnels par distance (5km à 100km).
                 </CardDescription>
                 <div className="text-xs text-gray-500 mt-2">
-                  💡 Bouton "Activer position" dans les filtres
+                  💡 Bouton Activer position dans les filtres
                 </div>
               </CardContent>
             </Card>
@@ -214,7 +214,7 @@ export default function HomePage() {
                 Bonus : Itinéraires intégrés
               </h3>
               <p className="text-gray-600 mb-4">
-                Sur chaque professionnel, cliquez sur "Itinéraire" pour ouvrir :
+                Sur chaque professionnel, cliquez sur Itinéraire pour ouvrir :
               </p>
               <div className="flex justify-center gap-4 text-sm">
                 <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded">🗺️ Google Maps</span>

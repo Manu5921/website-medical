@@ -1,9 +1,7 @@
--- Enable Row Level Security
-ALTER DATABASE postgres SET "app.jwt_secret" TO 'your-jwt-secret';
-
 -- Create storage bucket for avatars
 INSERT INTO storage.buckets (id, name, public)
-VALUES ('avatars', 'avatars', true);
+VALUES ('avatars', 'avatars', true)
+ON CONFLICT (id) DO NOTHING;
 
 -- Storage policies for avatars
 CREATE POLICY "Professionals can upload their own avatar" ON storage.objects
