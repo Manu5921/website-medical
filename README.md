@@ -1,18 +1,46 @@
-# HealthConnect Pro
+# 🏥 HealthConnect Pro
 
-Plateforme de prise de rendez-vous entre professionnels de santé.
+> Plateforme B2B de prise de rendez-vous entre professionnels de santé
 
-## 🚀 Technologies utilisées
+[![Next.js](https://img.shields.io/badge/Next.js-15.3-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5+-blue)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Ready-green)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-cyan)](https://tailwindcss.com/)
 
-- **Framework**: Next.js 15.3 avec App Router
-- **Styling**: Tailwind CSS 4
-- **Base de données**: Supabase (PostgreSQL + Auth + Storage)
-- **UI Components**: Shadcn/ui
-- **TypeScript**: Typage strict
-- **Formulaires**: React Hook Form + Zod
-- **Icons**: Lucide React
+Une solution complète permettant aux professionnels de santé de rechercher, contacter et prendre rendez-vous entre eux pour leurs patients.
 
-## 📋 Prérequis
+## ✨ Fonctionnalités
+
+### ✅ Actuellement disponibles
+- 🔐 **Authentification** complète avec Supabase Auth
+- 👤 **Gestion de profil** avec upload d'avatar et disponibilités
+- 🏥 **Annuaire des professionnels** avec recherche avancée
+- 📋 **API REST complète** pour la gestion des professionnels
+- 🎨 **Interface responsive** avec design médical moderne
+- 🛡️ **Sécurité** avec Row Level Security (RLS)
+
+### 🔄 En développement
+- 📅 Système de prise de rendez-vous
+- 🗺️ Intégration Google Maps
+- 📧 Notifications par email
+- 💬 Messagerie interne
+
+## 🛠 Stack Technique
+
+| Catégorie | Technologie | Version |
+|-----------|-------------|---------|
+| **Framework** | Next.js | 15.3 |
+| **Langage** | TypeScript | 5+ |
+| **Styling** | Tailwind CSS | 4 |
+| **Base de données** | Supabase | Latest |
+| **UI Components** | Shadcn/ui + Radix | Latest |
+| **Formulaires** | React Hook Form + Zod | Latest |
+| **Icons** | Lucide React | Latest |
+| **Déploiement** | Vercel | - |
+
+## 🚀 Installation
+
+### Prérequis
 
 - Node.js 18+
 - npm ou yarn
@@ -153,25 +181,43 @@ Le projet est compatible avec :
 - Render
 - Tout hébergeur supportant Next.js
 
-## 🔧 Configuration
+## 📁 Structure du Projet
 
-### Supabase RLS Policies
-
-Assurez-vous que les politiques RLS sont activées :
-
-```sql
--- Exemple pour la table professionals
-CREATE POLICY "Professionals can view all professionals" ON professionals
-  FOR SELECT USING (TRUE);
+```
+healthcare-booking/
+├── 📁 src/
+│   ├── 📁 app/                    # Pages Next.js App Router
+│   │   ├── 📁 (auth)/            # Routes d'authentification
+│   │   ├── 📁 (dashboard)/       # Routes protégées
+│   │   └── 📁 api/               # API Routes
+│   ├── 📁 components/
+│   │   ├── 📁 ui/                # Composants Shadcn/ui
+│   │   ├── 📁 layout/            # Navigation et layout
+│   │   └── 📁 professionals/     # Composants métier
+│   ├── 📁 hooks/                 # Hooks personnalisés
+│   ├── 📁 lib/                   # Utilitaires et config
+│   └── 📁 types/                 # Types TypeScript
+├── 📁 supabase/                  # Schéma de base de données
+└── 📄 DEVBOOK.md                 # Documentation technique
 ```
 
-### Variables d'environnement de production
+## 🔧 Configuration Supabase
+
+### 1. Créer les tables
+
+Exécutez le script SQL dans votre projet Supabase :
+
+```bash
+# Le contenu de supabase/schema.sql
+```
+
+### 2. Variables d'environnement
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-NEXT_PUBLIC_APP_URL=https://your-domain.com
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 ## 🤝 Contribution
@@ -182,12 +228,30 @@ NEXT_PUBLIC_APP_URL=https://your-domain.com
 4. Push sur la branche (`git push origin feature/nouvelle-fonctionnalite`)
 5. Ouvrez une Pull Request
 
-## 📝 Données de test
+## 🧪 Test avec données fictives
 
-Le projet inclut des données de test :
-- 3 professionnels fictifs
-- Disponibilités d'exemple
+Le projet inclut des **données de test complètes** pour tester l'annuaire sans base de données :
+
+### 👥 12 professionnels fictifs
+- Différentes professions (médecin, infirmier, kinésithérapeute, etc.)
+- Villes variées (Paris, Lyon, Marseille, Toulouse...)
+- Biographies et informations réalistes
 - Numéros RPPS de test
+
+### 🔍 Fonctionnalités testables
+- ✅ Navigation dans l'annuaire (`/professionals`)
+- ✅ Recherche par profession, ville, nom
+- ✅ Pagination des résultats
+- ✅ Vue liste/grille responsive
+- ✅ Consultation des profils détaillés
+- ✅ Interface mobile et desktop
+
+### 🚀 Démarrage rapide en mode test
+```bash
+npm run dev
+# → Aller sur http://localhost:3000/professionals
+# → Tester la recherche et les filtres
+```
 
 ## 🐛 Problèmes connus
 
