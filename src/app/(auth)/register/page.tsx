@@ -105,7 +105,7 @@ export default function RegisterPage() {
         email: data.email,
         password: data.password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/confirm`,
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || window.location.origin}/confirm`,
           data: {
             registration_data: {
               firstName: data.firstName,
@@ -134,40 +134,10 @@ export default function RegisterPage() {
         return
       }
 
-      // Vérifier si l'email a été confirmé (en mode dev, peut être automatique)
-      if (!authData.user.email_confirmed_at && authData.user.identities?.length === 0) {
-        // L'utilisateur doit confirmer son email
-        setUserEmail(data.email)
-        setShowEmailConfirmation(true)
-        return
-      }
-
-      // Create professional profile seulement si email confirmé
-      const { error: profileError } = await supabase
-        .from('professionals')
-        .insert({
-          id: authData.user.id,
-          email: data.email,
-          first_name: data.firstName,
-          last_name: data.lastName,
-          profession: data.profession as Profession,
-          rpps_number: data.rppsNumber,
-          phone: data.phone,
-          address: data.address,
-          city: data.city,
-          postal_code: data.postalCode,
-          latitude: data.latitude || null,
-          longitude: data.longitude || null,
-          bio: data.bio || null,
-        })
-
-      if (profileError) {
-        setError('Erreur lors de la création du profil professionnel')
-        return
-      }
-
-      router.push('/dashboard')
-      router.refresh()
+      // Stocker les données d'inscription dans les métadonnées utilisateur
+      // Le profil sera créé après confirmation de l'email
+      setUserEmail(data.email)
+      setShowEmailConfirmation(true)
     } catch {
       setError('Une erreur est survenue. Veuillez réessayer.')
     } finally {
