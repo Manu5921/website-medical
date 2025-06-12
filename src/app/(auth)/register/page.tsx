@@ -132,10 +132,43 @@ export default function RegisterPage() {
         return
       }
 
-      // Stocker les données d'inscription dans les métadonnées utilisateur
-      // Le profil sera créé après confirmation de l'email
-      setUserEmail(data.email)
-      setShowEmailConfirmation(true)
+      // Vérifier si l'email doit être confirmé
+      const requiresEmailConfirmation = !authData.user.email_confirmed_at
+
+      if (requiresEmailConfirmation) {
+        // Email de confirmation requis
+        setUserEmail(data.email)
+        setShowEmailConfirmation(true)
+      } else {
+        // Email déjà confirmé (ou confirmation désactivée)
+        // Créer directement le profil professionnel
+        const { error: profileError } = await supabase
+          .from('professionals')
+          .insert({
+            id: authData.user.id,
+            email: data.email,
+            first_name: data.firstName,
+            last_name: data.lastName,
+            profession: data.profession as Profession,
+            rpps_number: data.rppsNumber,
+            phone: data.phone,
+            address: data.address,
+            city: data.city,
+            postal_code: data.postalCode,
+            latitude: data.latitude || null,
+            longitude: data.longitude || null,
+            bio: data.bio || null,
+          })
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError)
+          setError('Erreur lors de la création du profil professionnel')
+          return
+        }
+
+        // Rediriger vers le dashboard
+        window.location.href = '/dashboard'
+      }
     } catch {
       setError('Une erreur est survenue. Veuillez réessayer.')
     } finally {
