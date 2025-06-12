@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  // Temporairement désactivé pour debug
-  console.log('Middleware called for:', request.nextUrl.pathname)
+  // Temporairement désactivé pour permettre l'accès au site
+  // Le middleware Supabase sera réactivé une fois les variables env configurées
   return NextResponse.next()
 }
 
