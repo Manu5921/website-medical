@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import { mockProfessionals, professionLabels } from '@/lib/mockData'
 import { Professional } from '@/types'
+import BookAppointmentDialog from '@/components/appointments/BookAppointmentDialog'
 
 interface PageProps {
   params: Promise<{ id: string }>
@@ -79,10 +80,6 @@ export default function ProfessionalDetailPage({ params }: PageProps) {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase()
   }
 
-  const handleBookAppointment = () => {
-    // TODO: Rediriger vers la page de prise de RDV
-    alert('Fonctionnalité de prise de RDV à venir !')
-  }
 
   const handleSendMessage = () => {
     // TODO: Rediriger vers la messagerie
@@ -176,10 +173,12 @@ export default function ProfessionalDetailPage({ params }: PageProps) {
                   </div>
 
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <Button onClick={handleBookAppointment} className="flex-1">
-                      <Calendar className="mr-2 h-4 w-4" />
-                      Prendre RDV
-                    </Button>
+                    <BookAppointmentDialog professional={professional}>
+                      <Button className="flex-1">
+                        <Calendar className="mr-2 h-4 w-4" />
+                        Prendre RDV
+                      </Button>
+                    </BookAppointmentDialog>
                     <Button variant="outline" onClick={handleSendMessage} className="flex-1">
                       <Mail className="mr-2 h-4 w-4" />
                       Envoyer un message
