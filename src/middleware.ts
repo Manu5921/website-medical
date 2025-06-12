@@ -1,6 +1,6 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { NextResponse } from 'next/server'
 
-export async function middleware(_request: NextRequest) {
+export async function middleware() {
   // Temporairement désactivé pour permettre l'accès au site
   // Le middleware Supabase sera réactivé une fois les variables env configurées
   return NextResponse.next()
