@@ -11,7 +11,19 @@ import { Professional } from '@/types'
 export default function DashboardPageClient() {
   const [loading, setLoading] = useState(true)
   const [professional, setProfessional] = useState<Professional | null>(null)
-  const [appointments, setAppointments] = useState<any[]>([])
+  const [appointments, setAppointments] = useState<Array<{
+    id: string
+    patient_first_name: string
+    patient_last_name: string
+    status: string
+    requester_id: string
+    provider_id: string
+    reason: string
+    appointment_date: string
+    appointment_time: string
+    requester?: { first_name: string; last_name: string; profession: string }
+    provider?: { first_name: string; last_name: string; profession: string }
+  }>>([])
   const [stats, setStats] = useState({
     pending: 0,
     confirmed: 0,
